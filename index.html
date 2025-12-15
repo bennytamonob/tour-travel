@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
     MapPin, Car, Phone, Instagram, Facebook, 
-    LogIn, Edit, Save, X, Menu, Search, Video, User, Star, LogOut, Lock, UserCog
+    LogIn, Edit, Save, X, Menu, Search, Video, User, Star, LogOut, Lock
 } from 'lucide-react';
 
-// !!! URL APPS SCRIPT ANDA SUDAH TERPASANG !!!
+// !!! URL APPS SCRIPT ANDA !!!
 const API_URL = "https://script.google.com/macros/s/AKfycbxync_QnLS1fZ6pRxgG_3rASw_TJkSqSy-YdQa28XpaiAt1PkBmRikc_XaD-8-G894k9w/exec"; 
 
 // --- MOCK DATA DEFAULT ---
 const defaultData = {
-    // DATA LOGIN ADMIN (Sekarang bisa diedit & disimpan ke Database)
     adminUsername: "admin",
     adminPassword: "bali123",
-
     companyName: "Bali Dwipa Tour",
     tagline: "Rasakan Keajaiban Pulau Dewata Bersama Kami",
     aboutText: "Kami adalah penyedia layanan wisata terpercaya di Bali yang mengutamakan kenyamanan, budaya, dan pengalaman tak terlupakan. Sopir berpengalaman dan armada terawat siap menemani liburan Anda.",
@@ -205,8 +203,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, siteData }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Menggunakan data dari Spreadsheet/State
-        // Fallback ke default 'admin'/'bali123' jika data belum terset
+        // Fallback ke default jika data belum terset
         const validUser = siteData?.adminUsername || "admin";
         const validPass = siteData?.adminPassword || "bali123";
 
@@ -444,12 +441,10 @@ export default function App() {
     // FETCH DATA SAAT LOAD
     useEffect(() => {
         const fetchData = async () => {
-            // Cek session admin
             const sessionAdmin = localStorage.getItem('baliAdminSession');
             if (sessionAdmin === 'true') setIsAdmin(true);
 
-            // LOGIKA BARU: Cek apakah API_URL adalah URL yang valid sebelum fetch
-            // Kita anggap URL Apps Script selalu mengandung "script.google.com"
+            // Cek URL API
             const isValidUrl = API_URL && API_URL.includes("script.google.com");
 
             if (!isValidUrl) {
@@ -461,21 +456,15 @@ export default function App() {
             }
 
             try {
-                // Ambil data dari Google Sheet
                 const response = await fetch(API_URL);
                 const result = await response.json();
                 
                 if (result && result.status !== 'empty' && result.companyName) {
                     setSiteData(result);
-                    // Update backup localstorage juga
                     localStorage.setItem('baliTourData', JSON.stringify(result));
-                } else {
-                    // Jika sheet kosong, gunakan defaultData
-                    console.log("Sheet kosong atau format baru, menggunakan data default.");
                 }
             } catch (error) {
-                console.error("Gagal mengambil data dari Google Sheet:", error);
-                // Fallback ke localStorage jika offline/error
+                console.error("Gagal mengambil data, menggunakan mode offline:", error);
                 const savedData = localStorage.getItem('baliTourData');
                 if (savedData) setSiteData(JSON.parse(savedData));
             } finally {
@@ -501,37 +490,34 @@ export default function App() {
     const handleDataUpdate = async (newData) => {
         setIsSaving(true);
         
-        // 1. Update State Lokal (Agar UI langsung berubah)
+        // 1. Simpan Lokal
         setSiteData(newData);
         localStorage.setItem('baliTourData', JSON.stringify(newData));
 
-        // 2. Kirim ke Google Sheet
+        // 2. Simpan ke Google Sheet
         const isValidUrl = API_URL && API_URL.includes("script.google.com");
         
         if (isValidUrl) {
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Penting untuk Google Apps Script
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newData)
                 });
                 alert("Data berhasil disimpan ke Google Spreadsheet!");
             } catch (error) {
-                console.error("Gagal menyimpan ke Sheet:", error);
-                alert("Gagal menyimpan ke Cloud (Cek koneksi). Data tersimpan di browser sementara.");
+                alert("Gagal koneksi ke Google. Data tersimpan di browser saja.");
             }
         } else {
-            alert("Data tersimpan di Browser! (Hubungkan URL Script untuk simpan ke Database)");
+            alert("Data tersimpan di Browser! (URL Script belum valid)");
         }
         
         setIsSaving(false);
     };
 
     if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center bg-stone-50 text-amber-600 font-serif">Memuat Data...</div>;
+        return <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 text-amber-600 font-serif"><div className="spinner mb-4"></div>Memuat Data...</div>;
     }
 
     return (
@@ -552,6 +538,18 @@ export default function App() {
                 }
                 .gold-gradient {
                     background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
+                }
+                .spinner {
+                    border: 4px solid rgba(0, 0, 0, 0.1);
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    border-left-color: #d97706;
+                    animation: spin 1s ease infinite;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
                 }
             `}</style>
 
@@ -582,11 +580,7 @@ export default function App() {
                         {siteData.aboutText}
                     </p>
                     <div className="mt-8 flex justify-center gap-2">
-                        <Star className="text-amber-500 fill-current" />
-                        <Star className="text-amber-500 fill-current" />
-                        <Star className="text-amber-500 fill-current" />
-                        <Star className="text-amber-500 fill-current" />
-                        <Star className="text-amber-500 fill-current" />
+                        {[...Array(5)].map((_, i) => <Star key={i} className="text-amber-500 fill-current" />)}
                     </div>
                 </div>
             </div>
