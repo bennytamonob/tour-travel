@@ -252,7 +252,7 @@
         // KONFIGURASI PENTING
         // ==========================================
         
-        // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DISINI
+        // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DISINI (Bisa dikosongkan untuk mode Demo)
         const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx62TFJ9XdNFY5u4Ayun8RNP6B1nTicr0vSXtMkwgd5BQaYoJFEHe0fvDjR5IzWJ--ybg/exec'; 
 
         // ==========================================
@@ -261,10 +261,36 @@
 
         let globalConfig = {};
 
+        // DATA DEMO (Akan dipakai jika API_ENDPOINT kosong atau error)
+        const MOCK_DATA = {
+            config: {
+                company_name: "Bali Dwipa Travel (Demo)",
+                whatsapp: "628123456789",
+                instagram: "https://instagram.com",
+                facebook: "https://facebook.com",
+                tiktok: "https://tiktok.com",
+                hero_title: "The Soul of Bali Awaits You",
+                hero_desc: "Rasakan pengalaman spiritual dan budaya yang otentik. Website ini sedang dalam Mode Demo."
+            },
+            tours: [
+                { title: "Nusa Penida West", price: "IDR 750K", image: "https://images.unsplash.com/photo-1596395819057-e37f58a85344?auto=format&fit=crop&w=500&q=60", description: "Kelingking Beach, Broken Beach, Angel Billabong, Crystal Bay." },
+                { title: "Ubud Cultural Trip", price: "IDR 500K", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=60", description: "Monkey Forest, Tegalalang Rice Terrace, Tirta Empul Temple." },
+                { title: "Lempuyang Gates", price: "IDR 650K", image: "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=500&q=60", description: "Gates of Heaven, Tirta Gangga, Taman Ujung Water Palace." }
+            ],
+            cars: [
+                { name: "Toyota Avanza", price: "IDR 400K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "6 Seater" },
+                { name: "Toyota Innova", price: "IDR 750K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "7 Seater" },
+                { name: "Hiace Commuter", price: "IDR 1.200K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "15 Seater" }
+            ]
+        };
+
         // 1. Load Data on Startup
         window.addEventListener('DOMContentLoaded', async () => {
-            if(API_ENDPOINT === 'PASTE_URL_WEB_APP_GOOGLE_SCRIPT_DISINI' || API_ENDPOINT === '') {
-                alert("Harap masukkan URL API Google Script ke dalam kode HTML baris 195.");
+            
+            // Cek jika API URL Kosong -> Gunakan Data Demo
+            if(!API_ENDPOINT || API_ENDPOINT === 'PASTE_URL_WEB_APP_GOOGLE_SCRIPT_DISINI' || API_ENDPOINT === '') {
+                console.log("Mode Demo: Menggunakan data lokal.");
+                renderWebsite(MOCK_DATA);
                 document.getElementById('page-loader').style.display = 'none';
                 return;
             }
@@ -277,11 +303,12 @@
                 if(result.status === 'success') {
                     renderWebsite(result.data);
                 } else {
-                    alert("Gagal memuat data dari Spreadsheet.");
+                    alert("Gagal memuat data, beralih ke mode demo.");
+                    renderWebsite(MOCK_DATA);
                 }
             } catch (error) {
-                console.error(error);
-                alert("Koneksi Error. Pastikan URL API benar.");
+                console.warn("Koneksi API Error (Mungkin belum diset), menggunakan Data Demo:", error);
+                renderWebsite(MOCK_DATA);
             } finally {
                 document.getElementById('page-loader').style.opacity = '0';
                 setTimeout(() => {
@@ -356,6 +383,11 @@
         }
 
         async function doLogin() {
+            if(!API_ENDPOINT) {
+                alert("Fitur Login hanya bekerja jika sudah terhubung ke Google Sheet. Saat ini Anda dalam Mode Demo.");
+                return;
+            }
+
             const pass = document.getElementById('admin-pass').value;
             const btn = document.querySelector('#login-form button');
             
@@ -395,6 +427,11 @@
         }
 
         async function saveConfig() {
+            if(!API_ENDPOINT) {
+                alert("Tidak dapat menyimpan karena belum terhubung ke Google Sheet.");
+                return;
+            }
+
             const newData = {
                 company_name: document.getElementById('edit-name').value,
                 whatsapp: document.getElementById('edit-wa').value,
