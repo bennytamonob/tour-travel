@@ -1,0 +1,666 @@
+import React, { useState, useEffect } from 'react';
+import { 
+    MapPin, Car, Phone, Instagram, Facebook, 
+    LogIn, Edit, Save, X, Menu, Search, Video, User, Star, LogOut, Lock, UserCog
+} from 'lucide-react';
+
+// !!! URL APPS SCRIPT ANDA SUDAH TERPASANG !!!
+const API_URL = "https://script.google.com/macros/s/AKfycbxync_QnLS1fZ6pRxgG_3rASw_TJkSqSy-YdQa28XpaiAt1PkBmRikc_XaD-8-G894k9w/exec"; 
+
+// --- MOCK DATA DEFAULT ---
+const defaultData = {
+    // DATA LOGIN ADMIN (Sekarang bisa diedit & disimpan ke Database)
+    adminUsername: "admin",
+    adminPassword: "bali123",
+
+    companyName: "Bali Dwipa Tour",
+    tagline: "Rasakan Keajaiban Pulau Dewata Bersama Kami",
+    aboutText: "Kami adalah penyedia layanan wisata terpercaya di Bali yang mengutamakan kenyamanan, budaya, dan pengalaman tak terlupakan. Sopir berpengalaman dan armada terawat siap menemani liburan Anda.",
+    whatsapp: "6281234567890",
+    social: {
+        instagram: "https://instagram.com",
+        facebook: "https://facebook.com",
+        tiktok: "https://tiktok.com"
+    },
+    heroImage: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1920",
+    tours: [
+        {
+            id: 1,
+            title: "Paket Nusa Penida Barat",
+            price: "IDR 350.000",
+            image: "https://images.unsplash.com/photo-1598324789736-4861f89564a0?auto=format&fit=crop&q=80&w=800",
+            desc: "Termasuk: Fast Boat, Makan Siang, Tour Island (Kelingking Beach, Broken Beach, Angel Billabong)."
+        },
+        {
+            id: 2,
+            title: "Paket Ubud & Kintamani",
+            price: "IDR 500.000",
+            image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&q=80&w=800",
+            desc: "Pura Tirta Empul, Monkey Forest, Tegalalang Rice Terrace, Makan Siang View Gunung Batur."
+        },
+        {
+            id: 3,
+            title: "Paket Bedugul & Tanah Lot",
+            price: "IDR 550.000",
+            image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&q=80&w=800",
+            desc: "Pura Ulun Danu Beratan, Handara Gate, Alas Kedaton, Sunset di Tanah Lot."
+        }
+    ],
+    cars: [
+        {
+            id: 1,
+            name: "Toyota Avanza",
+            price: "IDR 500.000 / 10 Jam",
+            image: "https://images.unsplash.com/photo-1628276089370-5d67667d4826?auto=format&fit=crop&q=80&w=800",
+            desc: "Termasuk Sopir + BBM. Kapasitas max 6 orang. Nyaman dan bersih."
+        },
+        {
+            id: 2,
+            name: "Toyota Innova Reborn",
+            price: "IDR 800.000 / 10 Jam",
+            image: "https://images.unsplash.com/photo-1698223639893-6c7c00e62933?auto=format&fit=crop&q=80&w=800",
+            desc: "Termasuk Sopir + BBM. Kelas VIP, suspensi empuk, AC dingin."
+        },
+        {
+            id: 3,
+            name: "Toyota Hiace",
+            price: "IDR 1.200.000 / 10 Jam",
+            image: "https://images.unsplash.com/photo-1669647201889-4b6706975510?auto=format&fit=crop&q=80&w=800",
+            desc: "Cocok untuk rombongan (10-14 orang). Termasuk Sopir + BBM."
+        }
+    ]
+};
+
+// --- COMPONENTS ---
+
+const Navbar = ({ data, onLoginClick, isAdmin, onLogout }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <nav className="fixed w-full z-50 bg-stone-900/90 backdrop-blur-md text-white border-b border-amber-600/30">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-20">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center">
+                            <span className="font-serif text-2xl font-bold text-stone-900">B</span>
+                        </div>
+                        <span className="font-serif text-xl font-bold tracking-wide text-amber-500">{data.companyName}</span>
+                    </div>
+                    <div className="hidden md:block">
+                        <div className="ml-10 flex items-baseline space-x-8">
+                            <a href="#home" className="hover:text-amber-500 px-3 py-2 rounded-md text-sm font-medium transition">Beranda</a>
+                            <a href="#tours" className="hover:text-amber-500 px-3 py-2 rounded-md text-sm font-medium transition">Paket Tour</a>
+                            <a href="#cars" className="hover:text-amber-500 px-3 py-2 rounded-md text-sm font-medium transition">Sewa Mobil</a>
+                            <a href="#contact" className="hover:text-amber-500 px-3 py-2 rounded-md text-sm font-medium transition">Kontak</a>
+                            {isAdmin ? (
+                                <button onClick={onLogout} className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm flex items-center gap-2">
+                                    <LogOut size={16} /> Logout Admin
+                                </button>
+                            ) : (
+                                <button onClick={onLoginClick} className="bg-amber-600 hover:bg-amber-700 text-stone-900 px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition">
+                                    <User size={16} /> Admin Login
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="-mr-2 flex md:hidden">
+                        <button onClick={() => setIsOpen(!isOpen)} className="bg-stone-800 p-2 rounded-md text-gray-400 hover:text-white">
+                            <Menu />
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {/* Mobile Menu */}
+            {isOpen && (
+                <div className="md:hidden bg-stone-900 border-t border-stone-800">
+                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        <a href="#home" className="block px-3 py-2 rounded-md text-base font-medium hover:text-amber-500">Beranda</a>
+                        <a href="#tours" className="block px-3 py-2 rounded-md text-base font-medium hover:text-amber-500">Paket Tour</a>
+                        <a href="#cars" className="block px-3 py-2 rounded-md text-base font-medium hover:text-amber-500">Sewa Mobil</a>
+                        {isAdmin ? (
+                            <button onClick={onLogout} className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-500">Logout</button>
+                        ) : (
+                            <button onClick={onLoginClick} className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-amber-500">Admin Login</button>
+                        )}
+                    </div>
+                </div>
+            )}
+        </nav>
+    );
+};
+
+const Hero = ({ data }) => {
+    return (
+        <div id="home" className="relative h-screen">
+            <div className="absolute inset-0">
+                <img className="w-full h-full object-cover" src={data.heroImage} alt="Bali Scenery" />
+                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+            </div>
+            <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 h-full flex flex-col justify-center items-center text-center">
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg">
+                    {data.companyName}
+                </h1>
+                <p className="mt-6 max-w-3xl text-xl text-gray-200 font-light italic">
+                    "{data.tagline}"
+                </p>
+                <div className="mt-10">
+                    <a href={`https://wa.me/${data.whatsapp}`} target="_blank" rel="noreferrer" className="gold-gradient text-stone-900 font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 flex items-center gap-2">
+                        <Phone size={20} /> Booking Sekarang via WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SectionHeader = ({ title, subtitle }) => (
+    <div className="text-center mb-12">
+        <h2 className="text-amber-600 font-semibold tracking-wide uppercase text-sm">{subtitle}</h2>
+        <h3 className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl font-serif">
+            {title}
+        </h3>
+        <div className="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+    </div>
+);
+
+const PackageCard = ({ item, type, whatsapp }) => {
+    const message = type === 'tour' 
+        ? `Halo, saya tertarik dengan paket tour: ${item.title}` 
+        : `Halo, saya ingin menyewa mobil: ${item.name}`;
+    
+    return (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border border-stone-100">
+            <div className="h-48 overflow-hidden relative">
+                <img className="w-full h-full object-cover transition duration-500 hover:scale-110" src={item.image} alt={item.title || item.name} />
+                <div className="absolute top-0 right-0 bg-amber-600 text-white px-3 py-1 rounded-bl-lg font-bold text-sm">
+                    Best Seller
+                </div>
+            </div>
+            <div className="p-6">
+                <h4 className="text-xl font-bold text-stone-900 font-serif mb-2">{item.title || item.name}</h4>
+                <p className="text-amber-600 font-bold text-lg mb-4">{item.price}</p>
+                <p className="text-gray-600 text-sm mb-6 leading-relaxed line-clamp-3">
+                    {item.desc}
+                </p>
+                <a 
+                    href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block w-full text-center bg-stone-900 text-white py-3 rounded-lg hover:bg-stone-800 transition flex items-center justify-center gap-2"
+                >
+                    <Phone size={16} /> Pesan Sekarang
+                </a>
+            </div>
+        </div>
+    );
+};
+
+const LoginModal = ({ isOpen, onClose, onLogin, siteData }) => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    if (!isOpen) return null;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Menggunakan data dari Spreadsheet/State
+        // Fallback ke default 'admin'/'bali123' jika data belum terset
+        const validUser = siteData?.adminUsername || "admin";
+        const validPass = siteData?.adminPassword || "bali123";
+
+        if (username === validUser && password === validPass) {
+            onLogin();
+            onClose();
+            setUsername("");
+            setPassword("");
+            setError("");
+        } else {
+            setError(`Username atau Password salah! Default: admin / bali123`);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[60] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <form onSubmit={handleSubmit} className="p-8">
+                        <div className="text-center mb-6">
+                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 mb-4">
+                                <User className="h-6 w-6 text-amber-600" />
+                            </div>
+                            <h3 className="text-lg leading-6 font-medium text-gray-900">Admin Login</h3>
+                            <p className="text-sm text-gray-500">Terhubung dengan Database Google Spreadsheet</p>
+                        </div>
+                        {error && <div className="mb-4 text-red-500 text-sm text-center font-bold bg-red-50 p-2 rounded">{error}</div>}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Username</label>
+                                <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Password</label>
+                                <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500" />
+                            </div>
+                        </div>
+                        <div className="mt-6 flex gap-3">
+                            <button type="button" onClick={onClose} className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">Batal</button>
+                            <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-amber-600 text-base font-medium text-white hover:bg-amber-700 focus:outline-none">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AdminPanel = ({ data, onUpdate, onClose, isSaving }) => {
+    const [formData, setFormData] = useState(data);
+    const [activeTab, setActiveTab] = useState('general'); // general, tours, cars, security
+
+    const handleChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSocialChange = (platform, value) => {
+        setFormData(prev => ({
+            ...prev,
+            social: { ...prev.social, [platform]: value }
+        }));
+    };
+
+    const handleArrayChange = (type, id, field, value) => {
+        const newArray = formData[type].map(item => {
+            if (item.id === id) return { ...item, [field]: value };
+            return item;
+        });
+        setFormData(prev => ({ ...prev, [type]: newArray }));
+    };
+
+    const handleSave = () => {
+        onUpdate(formData);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[70] bg-gray-100 overflow-y-auto">
+            <div className="max-w-5xl mx-auto p-6 bg-white min-h-screen shadow-2xl">
+                <div className="flex justify-between items-center mb-8 border-b pb-4">
+                    <h2 className="text-2xl font-bold text-stone-800 flex items-center gap-2">
+                        <Edit className="text-amber-600" /> Admin Dashboard
+                    </h2>
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={handleSave} 
+                            disabled={isSaving}
+                            className={`${isSaving ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white px-4 py-2 rounded flex items-center gap-2 transition`}
+                        >
+                            <Save size={18} /> {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+                        </button>
+                        <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center gap-2">
+                            <X size={18} /> Tutup
+                        </button>
+                    </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-4 mb-6 border-b overflow-x-auto">
+                    {['general', 'tours', 'cars', 'security'].map(tab => (
+                        <button 
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 font-medium capitalize whitespace-nowrap ${activeTab === tab ? 'text-amber-600 border-b-2 border-amber-600' : 'text-gray-500'}`}
+                        >
+                            {tab === 'general' ? 'Info Umum' : tab === 'tours' ? 'Paket Tour' : tab === 'cars' ? 'Sewa Mobil' : 'Akun & Keamanan'}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === 'general' && (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Nama Perusahaan</label>
+                                <input type="text" value={formData.companyName} onChange={(e) => handleChange('companyName', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Nomor WhatsApp (62...)</label>
+                                <input type="text" value={formData.whatsapp} onChange={(e) => handleChange('whatsapp', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-700">Tagline (Hero Section)</label>
+                                <input type="text" value={formData.tagline} onChange={(e) => handleChange('tagline', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-700">Tentang Kami (Copywriting)</label>
+                                <textarea rows="4" value={formData.aboutText} onChange={(e) => handleChange('aboutText', e.target.value)} className="mt-1 w-full border p-2 rounded"></textarea>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-700">URL Gambar Utama</label>
+                                <input type="text" value={formData.heroImage} onChange={(e) => handleChange('heroImage', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                            </div>
+                        </div>
+                        <h3 className="font-bold text-lg mt-6">Social Media Links</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <input type="text" placeholder="Instagram URL" value={formData.social.instagram} onChange={(e) => handleSocialChange('instagram', e.target.value)} className="border p-2 rounded" />
+                            <input type="text" placeholder="Facebook URL" value={formData.social.facebook} onChange={(e) => handleSocialChange('facebook', e.target.value)} className="border p-2 rounded" />
+                            <input type="text" placeholder="TikTok URL" value={formData.social.tiktok} onChange={(e) => handleSocialChange('tiktok', e.target.value)} className="border p-2 rounded" />
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'security' && (
+                    <div className="space-y-6 max-w-lg">
+                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-4">
+                            <h4 className="font-bold text-amber-800 mb-2 flex items-center gap-2"><Lock size={16}/> Area Sensitif</h4>
+                            <p className="text-sm text-amber-700">
+                                Ubah username dan password login Admin di sini. Pastikan Anda mengingat perubahan ini.
+                                Data akan tersimpan di Google Spreadsheet.
+                            </p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700">Username Admin</label>
+                            <input type="text" value={formData.adminUsername || ""} onChange={(e) => handleChange('adminUsername', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700">Password Admin</label>
+                            <input type="text" value={formData.adminPassword || ""} onChange={(e) => handleChange('adminPassword', e.target.value)} className="mt-1 w-full border p-2 rounded" />
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'tours' && (
+                    <div className="space-y-8">
+                        {formData.tours.map((tour, index) => (
+                            <div key={tour.id} className="border p-4 rounded bg-gray-50 relative">
+                                <span className="absolute top-2 right-2 bg-stone-200 px-2 rounded text-xs">Paket {index + 1}</span>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold">Nama Paket</label>
+                                        <input type="text" value={tour.title} onChange={(e) => handleArrayChange('tours', tour.id, 'title', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold">Harga</label>
+                                        <input type="text" value={tour.price} onChange={(e) => handleArrayChange('tours', tour.id, 'price', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-xs font-bold">Deskripsi</label>
+                                        <textarea rows="2" value={tour.desc} onChange={(e) => handleArrayChange('tours', tour.id, 'desc', e.target.value)} className="w-full border p-2 rounded"></textarea>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-xs font-bold">URL Gambar</label>
+                                        <input type="text" value={tour.image} onChange={(e) => handleArrayChange('tours', tour.id, 'image', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {activeTab === 'cars' && (
+                    <div className="space-y-8">
+                        {formData.cars.map((car, index) => (
+                            <div key={car.id} className="border p-4 rounded bg-gray-50 relative">
+                                <span className="absolute top-2 right-2 bg-stone-200 px-2 rounded text-xs">Mobil {index + 1}</span>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold">Nama Mobil</label>
+                                        <input type="text" value={car.name} onChange={(e) => handleArrayChange('cars', car.id, 'name', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold">Harga Sewa</label>
+                                        <input type="text" value={car.price} onChange={(e) => handleArrayChange('cars', car.id, 'price', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-xs font-bold">Fasilitas / Deskripsi</label>
+                                        <textarea rows="2" value={car.desc} onChange={(e) => handleArrayChange('cars', car.id, 'desc', e.target.value)} className="w-full border p-2 rounded"></textarea>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-xs font-bold">URL Gambar</label>
+                                        <input type="text" value={car.image} onChange={(e) => handleArrayChange('cars', car.id, 'image', e.target.value)} className="w-full border p-2 rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// --- MAIN APP ---
+
+export default function App() {
+    const [siteData, setSiteData] = useState(defaultData);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showAdminPanel, setShowAdminPanel] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // FETCH DATA SAAT LOAD
+    useEffect(() => {
+        const fetchData = async () => {
+            // Cek session admin
+            const sessionAdmin = localStorage.getItem('baliAdminSession');
+            if (sessionAdmin === 'true') setIsAdmin(true);
+
+            // LOGIKA BARU: Cek apakah API_URL adalah URL yang valid sebelum fetch
+            // Kita anggap URL Apps Script selalu mengandung "script.google.com"
+            const isValidUrl = API_URL && API_URL.includes("script.google.com");
+
+            if (!isValidUrl) {
+                console.log("API URL belum diset atau placeholder, menggunakan LocalStorage/Default");
+                const savedData = localStorage.getItem('baliTourData');
+                if (savedData) setSiteData(JSON.parse(savedData));
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                // Ambil data dari Google Sheet
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                if (result && result.status !== 'empty' && result.companyName) {
+                    setSiteData(result);
+                    // Update backup localstorage juga
+                    localStorage.setItem('baliTourData', JSON.stringify(result));
+                } else {
+                    // Jika sheet kosong, gunakan defaultData
+                    console.log("Sheet kosong atau format baru, menggunakan data default.");
+                }
+            } catch (error) {
+                console.error("Gagal mengambil data dari Google Sheet:", error);
+                // Fallback ke localStorage jika offline/error
+                const savedData = localStorage.getItem('baliTourData');
+                if (savedData) setSiteData(JSON.parse(savedData));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleLogin = () => {
+        setIsAdmin(true);
+        localStorage.setItem('baliAdminSession', 'true');
+        setShowAdminPanel(true);
+    };
+
+    const handleLogout = () => {
+        setIsAdmin(false);
+        setShowAdminPanel(false);
+        localStorage.removeItem('baliAdminSession');
+    };
+
+    const handleDataUpdate = async (newData) => {
+        setIsSaving(true);
+        
+        // 1. Update State Lokal (Agar UI langsung berubah)
+        setSiteData(newData);
+        localStorage.setItem('baliTourData', JSON.stringify(newData));
+
+        // 2. Kirim ke Google Sheet
+        const isValidUrl = API_URL && API_URL.includes("script.google.com");
+        
+        if (isValidUrl) {
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Penting untuk Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newData)
+                });
+                alert("Data berhasil disimpan ke Google Spreadsheet!");
+            } catch (error) {
+                console.error("Gagal menyimpan ke Sheet:", error);
+                alert("Gagal menyimpan ke Cloud (Cek koneksi). Data tersimpan di browser sementara.");
+            }
+        } else {
+            alert("Data tersimpan di Browser! (Hubungkan URL Script untuk simpan ke Database)");
+        }
+        
+        setIsSaving(false);
+    };
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center bg-stone-50 text-amber-600 font-serif">Memuat Data...</div>;
+    }
+
+    return (
+        <div className="bg-stone-50 min-h-screen text-stone-800">
+            {/* INJECT CSS UNTUK FONT DAN STYLE CUSTOM */}
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+                
+                body {
+                    font-family: 'Lato', sans-serif;
+                    background-color: #FAFAF9;
+                }
+                h1, h2, h3, h4, h5, h6 {
+                    font-family: 'Playfair Display', serif;
+                }
+                .pattern-bali {
+                    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d6c096' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+                }
+                .gold-gradient {
+                    background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
+                }
+            `}</style>
+
+            <Navbar 
+                data={siteData} 
+                onLoginClick={() => setShowLogin(true)} 
+                isAdmin={isAdmin} 
+                onLogout={handleLogout}
+            />
+
+            {isAdmin && (
+                <div className="fixed bottom-6 right-6 z-40">
+                    <button 
+                        onClick={() => setShowAdminPanel(true)}
+                        className="bg-stone-900 text-white p-4 rounded-full shadow-2xl hover:bg-stone-800 border-2 border-amber-500 animate-bounce"
+                    >
+                        <Edit size={24} />
+                    </button>
+                </div>
+            )}
+
+            <Hero data={siteData} />
+
+            <div id="about" className="py-20 bg-white pattern-bali">
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <h2 className="text-3xl font-serif font-bold text-stone-900 mb-6">Om Swastiastu</h2>
+                    <p className="text-lg text-gray-600 leading-relaxed">
+                        {siteData.aboutText}
+                    </p>
+                    <div className="mt-8 flex justify-center gap-2">
+                        <Star className="text-amber-500 fill-current" />
+                        <Star className="text-amber-500 fill-current" />
+                        <Star className="text-amber-500 fill-current" />
+                        <Star className="text-amber-500 fill-current" />
+                        <Star className="text-amber-500 fill-current" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="tours" className="py-20 bg-stone-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <SectionHeader title="Paket Tour Pilihan" subtitle="Eksplorasi Keindahan" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {siteData.tours.map(tour => (
+                            <PackageCard key={tour.id} item={tour} type="tour" whatsapp={siteData.whatsapp} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div id="cars" className="py-20 bg-white pattern-bali">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <SectionHeader title="Sewa Mobil Terpercaya" subtitle="Kenyamanan Perjalanan" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {siteData.cars.map(car => (
+                            <PackageCard key={car.id} item={car} type="car" whatsapp={siteData.whatsapp} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div id="contact" className="bg-stone-900 text-white py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div>
+                            <h3 className="text-2xl font-serif font-bold text-amber-500 mb-4">{siteData.companyName}</h3>
+                            <p className="text-stone-400">Melayani dengan sepenuh hati untuk pengalaman liburan terbaik Anda di Pulau Dewata.</p>
+                        </div>
+                        <div>
+                            <h4 className="text-lg font-bold mb-4">Kontak Kami</h4>
+                            <div className="space-y-3">
+                                <a href={`https://wa.me/${siteData.whatsapp}`} className="flex items-center gap-3 text-stone-300 hover:text-white">
+                                    <Phone size={18} /> +{siteData.whatsapp}
+                                </a>
+                                <div className="flex items-center gap-3 text-stone-300">
+                                    <MapPin size={18} /> Denpasar, Bali, Indonesia
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 className="text-lg font-bold mb-4">Ikuti Kami</h4>
+                            <div className="flex space-x-4">
+                                <a href={siteData.social.instagram} className="bg-stone-800 p-3 rounded-full hover:bg-amber-600 transition"><Instagram size={20} /></a>
+                                <a href={siteData.social.facebook} className="bg-stone-800 p-3 rounded-full hover:bg-amber-600 transition"><Facebook size={20} /></a>
+                                <a href={siteData.social.tiktok} className="bg-stone-800 p-3 rounded-full hover:bg-amber-600 transition"><Video size={20} /></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-t border-stone-800 mt-12 pt-8 text-center text-stone-500 text-sm">
+                        &copy; {new Date().getFullYear()} {siteData.companyName}. All rights reserved.
+                    </div>
+                </div>
+            </div>
+
+            <LoginModal 
+                isOpen={showLogin} 
+                onClose={() => setShowLogin(false)} 
+                onLogin={handleLogin}
+                siteData={siteData}
+            />
+
+            {showAdminPanel && (
+                <AdminPanel 
+                    data={siteData} 
+                    onUpdate={handleDataUpdate} 
+                    onClose={() => setShowAdminPanel(false)} 
+                    isSaving={isSaving}
+                />
+            )}
+        </div>
+    );
+}
