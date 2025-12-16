@@ -354,12 +354,28 @@
             document.getElementById('admin-tour-list').innerHTML = tours.map((t, idx) => `
                 <div class="border p-3 rounded bg-gray-50 text-sm">
                     <div class="font-bold mb-2">ID: ${t.id} - ${t.title}</div>
+                    <label class="text-xs text-gray-500">Judul Paket:</label>
                     <input type="text" placeholder="Judul" class="admin-input" value="${t.title}" onchange="updateTour(${idx}, 'title', this.value)">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" placeholder="Harga" class="admin-input" value="${t.price}" onchange="updateTour(${idx}, 'price', this.value)">
-                        <input type="text" placeholder="Durasi" class="admin-input" value="${t.duration}" onchange="updateTour(${idx}, 'duration', this.value)">
+                        <div>
+                            <label class="text-xs text-gray-500">Harga:</label>
+                            <input type="text" placeholder="Harga" class="admin-input" value="${t.price}" onchange="updateTour(${idx}, 'price', this.value)">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">Durasi:</label>
+                            <input type="text" placeholder="Durasi" class="admin-input" value="${t.duration}" onchange="updateTour(${idx}, 'duration', this.value)">
+                        </div>
                     </div>
-                    <input type="text" placeholder="URL Gambar" class="admin-input" value="${t.img}" onchange="updateTour(${idx}, 'img', this.value)">
+                    
+                    <div class="mb-2">
+                        <label class="text-xs text-gray-500">Link Foto:</label>
+                        <div class="flex gap-2 items-center">
+                            <img src="${t.img}" class="w-12 h-12 object-cover rounded border bg-gray-200" onerror="this.src='https://via.placeholder.com/40'">
+                            <input type="text" placeholder="https://..." class="admin-input mb-0" value="${t.img}" onchange="updateTour(${idx}, 'img', this.value)">
+                        </div>
+                    </div>
+
+                    <label class="text-xs text-gray-500">Deskripsi:</label>
                     <textarea placeholder="Deskripsi" class="admin-input" onchange="updateTour(${idx}, 'desc', this.value)">${t.desc}</textarea>
                     <button onclick="deleteTour(${idx})" class="text-red-500 text-xs hover:underline">Hapus Paket Ini</button>
                 </div>
@@ -369,12 +385,27 @@
             document.getElementById('admin-car-list').innerHTML = cars.map((c, idx) => `
                 <div class="border p-3 rounded bg-gray-50 text-sm">
                     <div class="font-bold mb-2">ID: ${c.id} - ${c.title}</div>
+                    <label class="text-xs text-gray-500">Nama Mobil:</label>
                     <input type="text" placeholder="Nama Mobil" class="admin-input" value="${c.title}" onchange="updateCar(${idx}, 'title', this.value)">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" placeholder="Harga" class="admin-input" value="${c.price}" onchange="updateCar(${idx}, 'price', this.value)">
-                        <input type="text" placeholder="Kapasitas" class="admin-input" value="${c.cap}" onchange="updateCar(${idx}, 'cap', this.value)">
+                        <div>
+                            <label class="text-xs text-gray-500">Harga:</label>
+                            <input type="text" placeholder="Harga" class="admin-input" value="${c.price}" onchange="updateCar(${idx}, 'price', this.value)">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">Kapasitas:</label>
+                            <input type="text" placeholder="Kapasitas" class="admin-input" value="${c.cap}" onchange="updateCar(${idx}, 'cap', this.value)">
+                        </div>
                     </div>
-                    <input type="text" placeholder="URL Gambar" class="admin-input" value="${c.img}" onchange="updateCar(${idx}, 'img', this.value)">
+                    
+                    <div class="mb-2">
+                        <label class="text-xs text-gray-500">Link Foto:</label>
+                        <div class="flex gap-2 items-center">
+                            <img src="${c.img}" class="w-12 h-12 object-cover rounded border bg-gray-200" onerror="this.src='https://via.placeholder.com/40'">
+                            <input type="text" placeholder="https://..." class="admin-input mb-0" value="${c.img}" onchange="updateCar(${idx}, 'img', this.value)">
+                        </div>
+                    </div>
+
                     <button onclick="deleteCar(${idx})" class="text-red-500 text-xs hover:underline">Hapus Mobil Ini</button>
                 </div>
             `).join('');
