@@ -3,479 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bali Cultural Tour & Travel</title>
-    <!-- Tailwind CSS -->
+    <title>Bali Pesona Tour & Travel</title>
+    <!-- Tailwind CSS untuk styling cepat dan modern -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Custom Styles for Bali Vibe -->
     <style>
-        :root {
-            --bali-gold: #D4AF37;
-            --bali-dark: #2C241B;
-            --bali-cream: #FAF9F6;
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
         }
-        body { font-family: 'Lato', sans-serif; background-color: var(--bali-cream); color: var(--bali-dark); }
-        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
-        
-        /* Pattern Batik Overlay */
-        .batik-pattern {
-            background-color: #FAF9F6;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
         }
-
-        .gold-gradient {
-            background: linear-gradient(135deg, #D4AF37 0%, #AA8A25 100%);
+        .card-zoom:hover img {
+            transform: scale(1.1);
         }
-
-        /* Loading Spinner */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #D4AF37;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        .card-zoom img {
+            transition: transform 0.5s ease;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Smooth Scroll */
-        html { scroll-behavior: smooth; }
     </style>
 </head>
-<body class="relative">
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- Loading Screen -->
-    <div id="page-loader" class="fixed inset-0 z-50 bg-white flex flex-col justify-center items-center transition-opacity duration-500">
-        <div class="loader mb-4"></div>
-        <p class="text-sm tracking-widest text-gray-500 uppercase">Memuat Data...</p>
-    </div>
-
-    <!-- Admin Login Button (Hidden floating) -->
-    <button onclick="toggleAdminModal()" class="fixed bottom-5 right-5 z-40 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-[#D4AF37] transition duration-300 group">
-        <i class="fas fa-cog group-hover:rotate-90 transition"></i>
-    </button>
-
-    <!-- Navbar -->
-    <nav class="fixed w-full z-30 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-sm" id="navbar">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-om text-[#D4AF37] text-3xl"></i>
-                <a href="#" class="text-2xl font-serif font-bold text-gray-800 tracking-tight" id="nav-company">Loading...</a>
+    <!-- Navigasi Sederhana -->
+    <nav class="bg-white shadow-md fixed w-full z-50 top-0">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-plane-departure text-orange-500 text-2xl"></i>
+                    <span class="font-bold text-xl text-gray-800">Bali Pesona</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#home" class="hover:text-orange-500 transition">Beranda</a>
+                    <a href="#packages" class="hover:text-orange-500 transition">Paket Tour</a>
+                    <a href="#contact" class="hover:text-orange-500 transition">Kontak</a>
+                </div>
+                <!-- Tombol Mobile Menu (Hanya Icon) -->
+                <div class="md:hidden text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </div>
             </div>
-            <div class="hidden md:flex space-x-8 font-medium text-sm tracking-wide uppercase">
-                <a href="#home" class="hover:text-[#D4AF37] transition">Beranda</a>
-                <a href="#tours" class="hover:text-[#D4AF37] transition">Paket Tour</a>
-                <a href="#cars" class="hover:text-[#D4AF37] transition">Sewa Mobil</a>
-                <a href="#contact" class="hover:text-[#D4AF37] transition">Kontak</a>
-            </div>
-            <!-- Mobile Menu -->
-            <button class="md:hidden text-2xl" onclick="alert('Menu Mobile')"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="relative h-screen flex items-center justify-center text-center px-4 overflow-hidden">
-        <!-- Background Image with Overlay -->
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?q=80&w=2070&auto=format&fit=crop" 
-                 alt="Bali Temple" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/40"></div>
-        </div>
-
-        <div class="relative z-10 text-white max-w-4xl mx-auto pt-20">
-            <p class="text-[#D4AF37] font-medium tracking-[0.2em] mb-4 uppercase">Om Swastiastu</p>
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight drop-shadow-lg" id="hero-title">...</h1>
-            <p class="text-lg md:text-xl font-light mb-10 opacity-90 max-w-2xl mx-auto" id="hero-desc">...</p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="#tours" class="bg-[#D4AF37] hover:bg-[#b8962e] text-white px-8 py-3 rounded-none uppercase tracking-widest font-semibold transition duration-300">
-                    Lihat Paket
-                </a>
-                <a href="#contact" onclick="openWhatsApp()" class="border border-white hover:bg-white hover:text-gray-900 text-white px-8 py-3 rounded-none uppercase tracking-widest font-semibold transition duration-300">
-                    Hubungi Kami
-                </a>
-            </div>
+    <section id="home" class="hero-bg h-screen flex items-center justify-center text-center text-white px-4">
+        <div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Jelajahi Keindahan Bali</h1>
+            <p class="text-lg md:text-xl mb-8 drop-shadow-md">Liburan tak terlupakan dengan pelayanan terbaik dan harga bersahabat.</p>
+            <a href="#packages" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg transform hover:-translate-y-1">
+                Lihat Paket Wisata
+            </a>
         </div>
     </section>
 
-    <!-- Tours Section -->
-    <section id="tours" class="py-20 batik-pattern">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16">
-                <span class="text-[#D4AF37] font-bold tracking-widest uppercase text-sm">Destinasi Pilihan</span>
-                <h2 class="text-4xl font-serif font-bold text-gray-800 mt-2">Paket Tour Eksklusif</h2>
-                <div class="w-20 h-1 bg-[#D4AF37] mx-auto mt-4"></div>
-            </div>
-
-            <div id="tour-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Data Tours injected via JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Cars Section -->
-    <section id="cars" class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
-                <div>
-                    <span class="text-[#D4AF37] font-bold tracking-widest uppercase text-sm">Transportasi Nyaman</span>
-                    <h2 class="text-4xl font-serif font-bold text-gray-800 mt-2">Armada Premium</h2>
+    <!-- Keunggulan Kami -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-12 text-gray-800">Kenapa Memilih Kami?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 border rounded-xl hover:shadow-xl transition">
+                    <div class="text-orange-500 text-4xl mb-4">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Terpercaya & Aman</h3>
+                    <p class="text-gray-600">Kami adalah agen travel lokal resmi dengan driver berpengalaman.</p>
                 </div>
-                <p class="text-gray-500 mt-4 md:mt-0 max-w-md text-sm">
-                    Kami menyediakan kendaraan bersih, terawat, dengan supir berpengalaman yang siap mengantar perjalanan anda.
-                </p>
+                <div class="p-6 border rounded-xl hover:shadow-xl transition">
+                    <div class="text-orange-500 text-4xl mb-4">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Harga Terbaik</h3>
+                    <p class="text-gray-600">Penawaran harga transparan tanpa biaya tersembunyi.</p>
+                </div>
+                <div class="p-6 border rounded-xl hover:shadow-xl transition">
+                    <div class="text-orange-500 text-4xl mb-4">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Dokumentasi Gratis</h3>
+                    <p class="text-gray-600">Driver kami siap membantu mengambil foto terbaik liburan Anda.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Paket Wisata -->
+    <section id="packages" class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Paket Populer</h2>
+                <p class="text-gray-600 mt-2">Pilihan destinasi favorit wisatawan di Bali</p>
             </div>
 
-            <div id="car-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Data Cars injected via JS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Paket 1: Nusa Penida -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
+                    <div class="overflow-hidden h-48">
+                        <img src="https://images.unsplash.com/photo-1598324789736-4861f89564a0?auto=format&fit=crop&w=800&q=80" alt="Nusa Penida" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded uppercase">Best Seller</span>
+                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 1 Hari</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Nusa Penida Trip</h3>
+                        <p class="text-gray-600 text-sm mb-4">Kelingking Beach, Broken Beach, Angel's Billabong, Crystal Bay.</p>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Mulai dari</p>
+                                <p class="text-lg font-bold text-orange-600">IDR 350K</p>
+                            </div>
+                            <button onclick="bookNow('Nusa Penida Trip')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                <i class="fab fa-whatsapp"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paket 2: Ubud & Kintamani -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
+                    <div class="overflow-hidden h-48">
+                        <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80" alt="Ubud Rice Terrace" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded uppercase">Budaya</span>
+                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 10 Jam</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Ubud & Kintamani</h3>
+                        <p class="text-gray-600 text-sm mb-4">Tegalalang Rice Terrace, Monkey Forest, Volcano View, Coffee Plantation.</p>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Mulai dari</p>
+                                <p class="text-lg font-bold text-orange-600">IDR 500K</p>
+                            </div>
+                            <button onclick="bookNow('Ubud & Kintamani')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                <i class="fab fa-whatsapp"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paket 3: South Bali / Uluwatu -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
+                    <div class="overflow-hidden h-48">
+                        <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=80" alt="Uluwatu Temple" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="bg-purple-100 text-purple-600 text-xs font-bold px-2 py-1 rounded uppercase">Sunset</span>
+                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 8 Jam</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Uluwatu Sunset</h3>
+                        <p class="text-gray-600 text-sm mb-4">GWK Cultural Park, Melasti Beach, Uluwatu Temple, Kecak Dance.</p>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Mulai dari</p>
+                                <p class="text-lg font-bold text-orange-600">IDR 450K</p>
+                            </div>
+                            <button onclick="bookNow('Uluwatu Sunset')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                <i class="fab fa-whatsapp"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action / Kontak -->
+    <section id="contact" class="py-16 bg-orange-600 text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Siap Liburan ke Bali?</h2>
+            <p class="text-lg mb-8 text-orange-100">Konsultasikan rencana perjalanan Anda bersama kami secara gratis. Kami siap menjemput Anda di Bandara Ngurah Rai.</p>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="https://wa.me/6281234567890?text=Halo%2C%20saya%20tertarik%20dengan%20paket%20wisata%20Bali" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-2xl"></i> Chat via WhatsApp
+                </a>
+                <a href="mailto:info@balipesona.com" class="bg-white hover:bg-gray-100 text-orange-600 font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fas fa-envelope text-xl"></i> Kirim Email
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer id="contact" class="bg-[#2C241B] text-white pt-20 pb-10">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-                <!-- Brand -->
-                <div>
-                    <h3 class="text-2xl font-serif font-bold text-[#D4AF37] mb-6" id="footer-company">...</h3>
-                    <p class="text-gray-400 leading-relaxed mb-6">
-                        Memberikan pelayanan terbaik dengan sentuhan keramahtamahan khas Bali. Perjalanan anda adalah prioritas kami.
-                    </p>
-                    <div class="flex gap-4">
-                        <a id="link-ig" href="#" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition"><i class="fab fa-instagram"></i></a>
-                        <a id="link-fb" href="#" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition"><i class="fab fa-facebook-f"></i></a>
-                        <a id="link-tt" href="#" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition"><i class="fab fa-tiktok"></i></a>
-                    </div>
-                </div>
-
-                <!-- Contact -->
-                <div>
-                    <h4 class="text-lg font-bold mb-6 tracking-wide">Hubungi Kami</h4>
-                    <ul class="space-y-4 text-gray-400">
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-map-marker-alt mt-1 text-[#D4AF37]"></i>
-                            <span>Denpasar, Bali, Indonesia</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fab fa-whatsapp mt-1 text-[#D4AF37]"></i>
-                            <span id="footer-wa">Loading...</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-envelope mt-1 text-[#D4AF37]"></i>
-                            <span>info@balitravel.com</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-lg font-bold mb-6 tracking-wide">Menu</h4>
-                    <ul class="space-y-3 text-gray-400">
-                        <li><a href="#home" class="hover:text-[#D4AF37] transition">Beranda</a></li>
-                        <li><a href="#tours" class="hover:text-[#D4AF37] transition">Paket Tour</a></li>
-                        <li><a href="#cars" class="hover:text-[#D4AF37] transition">Sewa Mobil</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-                <p>&copy; <script>document.write(new Date().getFullYear())</script> Bali Travel. All rights reserved.</p>
+    <footer class="bg-gray-800 text-gray-300 py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="mb-4">&copy; 2024 Bali Pesona Tour & Travel. All rights reserved.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#" class="hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-tiktok text-xl"></i></a>
             </div>
         </div>
     </footer>
 
-    <!-- ADMIN MODAL -->
-    <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex justify-center items-center p-4">
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg overflow-hidden">
-            <!-- Header -->
-            <div class="bg-[#2C241B] p-4 flex justify-between items-center text-white">
-                <h3 class="font-serif font-bold text-lg"><i class="fas fa-user-shield mr-2"></i> Admin Panel</h3>
-                <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-
-            <!-- Login Form -->
-            <div id="login-form" class="p-6">
-                <p class="text-sm text-gray-600 mb-4">Masukkan password admin untuk mengedit konten website.</p>
-                <input type="password" id="admin-pass" class="w-full border p-3 rounded mb-4 focus:ring-2 focus:ring-[#D4AF37] outline-none" placeholder="Password...">
-                <button onclick="doLogin()" class="w-full bg-[#D4AF37] hover:bg-[#b8962e] text-white py-2 rounded font-bold transition">LOGIN</button>
-            </div>
-
-            <!-- Edit Form (Hidden until logged in) -->
-            <div id="edit-form" class="hidden p-6 max-h-[70vh] overflow-y-auto">
-                <p class="text-xs text-green-600 mb-4 font-bold bg-green-100 p-2 rounded"><i class="fas fa-check-circle"></i> Terhubung ke Google Sheet</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Nama Perusahaan</label>
-                        <input type="text" id="edit-name" class="w-full border p-2 rounded text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Nomor WhatsApp (62...)</label>
-                        <input type="text" id="edit-wa" class="w-full border p-2 rounded text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Link Instagram</label>
-                        <input type="text" id="edit-ig" class="w-full border p-2 rounded text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Link Facebook</label>
-                        <input type="text" id="edit-fb" class="w-full border p-2 rounded text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Link TikTok</label>
-                        <input type="text" id="edit-tt" class="w-full border p-2 rounded text-sm">
-                    </div>
-                    <div class="border-t pt-2">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Hero Title (Judul Besar)</label>
-                        <textarea id="edit-hero-title" class="w-full border p-2 rounded text-sm h-20"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Hero Description</label>
-                        <textarea id="edit-hero-desc" class="w-full border p-2 rounded text-sm h-20"></textarea>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex gap-2">
-                    <button onclick="saveConfig()" class="flex-1 bg-green-600 text-white py-2 rounded text-sm font-bold hover:bg-green-700">SIMPAN PERUBAHAN</button>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 text-center italic">Untuk menambah/edit detail Paket Tour & Mobil, silakan edit langsung di tab "Tours" & "Cars" pada Google Sheet.</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // ==========================================
-        // KONFIGURASI PENTING
-        // ==========================================
-        
-        // PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DISINI (Bisa dikosongkan untuk mode Demo)
-        const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx62TFJ9XdNFY5u4Ayun8RNP6B1nTicr0vSXtMkwgd5BQaYoJFEHe0fvDjR5IzWJ--ybg/exec'; 
-
-        // ==========================================
-        // SYSTEM LOGIC
-        // ==========================================
-
-        let globalConfig = {};
-
-        // DATA DEMO (Akan dipakai jika API_ENDPOINT kosong atau error)
-        const MOCK_DATA = {
-            config: {
-                company_name: "Bali Dwipa Travel (Demo)",
-                whatsapp: "628123456789",
-                instagram: "https://instagram.com",
-                facebook: "https://facebook.com",
-                tiktok: "https://tiktok.com",
-                hero_title: "The Soul of Bali Awaits You",
-                hero_desc: "Rasakan pengalaman spiritual dan budaya yang otentik. Website ini sedang dalam Mode Demo."
-            },
-            tours: [
-                { title: "Nusa Penida West", price: "IDR 750K", image: "https://images.unsplash.com/photo-1596395819057-e37f58a85344?auto=format&fit=crop&w=500&q=60", description: "Kelingking Beach, Broken Beach, Angel Billabong, Crystal Bay." },
-                { title: "Ubud Cultural Trip", price: "IDR 500K", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=60", description: "Monkey Forest, Tegalalang Rice Terrace, Tirta Empul Temple." },
-                { title: "Lempuyang Gates", price: "IDR 650K", image: "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?auto=format&fit=crop&w=500&q=60", description: "Gates of Heaven, Tirta Gangga, Taman Ujung Water Palace." }
-            ],
-            cars: [
-                { name: "Toyota Avanza", price: "IDR 400K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "6 Seater" },
-                { name: "Toyota Innova", price: "IDR 750K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "7 Seater" },
-                { name: "Hiace Commuter", price: "IDR 1.200K", image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60", capacity: "15 Seater" }
-            ]
-        };
-
-        // 1. Load Data on Startup
-        window.addEventListener('DOMContentLoaded', async () => {
-            
-            // Cek jika API URL Kosong -> Gunakan Data Demo
-            if(!API_ENDPOINT || API_ENDPOINT === 'PASTE_URL_WEB_APP_GOOGLE_SCRIPT_DISINI' || API_ENDPOINT === '') {
-                console.log("Mode Demo: Menggunakan data lokal.");
-                renderWebsite(MOCK_DATA);
-                document.getElementById('page-loader').style.display = 'none';
-                return;
-            }
-            
-            try {
-                // Fetch Data using GET
-                const response = await fetch(`${API_ENDPOINT}?action=getData`);
-                const result = await response.json();
-
-                if(result.status === 'success') {
-                    renderWebsite(result.data);
-                } else {
-                    alert("Gagal memuat data, beralih ke mode demo.");
-                    renderWebsite(MOCK_DATA);
-                }
-            } catch (error) {
-                console.warn("Koneksi API Error (Mungkin belum diset), menggunakan Data Demo:", error);
-                renderWebsite(MOCK_DATA);
-            } finally {
-                document.getElementById('page-loader').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('page-loader').style.display = 'none';
-                }, 500);
-            }
-        });
-
-        // 2. Render Website
-        function renderWebsite(data) {
-            globalConfig = data.config;
-
-            // Render Config Text
-            setText('nav-company', data.config.company_name);
-            setText('footer-company', data.config.company_name);
-            setText('hero-title', data.config.hero_title);
-            setText('hero-desc', data.config.hero_desc);
-            setText('footer-wa', formatWA(data.config.whatsapp));
-
-            // Set Links
-            setHref('link-ig', data.config.instagram);
-            setHref('link-fb', data.config.facebook);
-            setHref('link-tt', data.config.tiktok);
-
-            // Render Tours
-            const tourContainer = document.getElementById('tour-grid');
-            tourContainer.innerHTML = '';
-            data.tours.forEach(tour => {
-                const imgUrl = tour.image && tour.image.includes('http') ? tour.image : 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=60';
-                
-                tourContainer.innerHTML += `
-                    <div class="bg-white group hover:-translate-y-2 transition duration-300 shadow-lg border border-gray-100 overflow-hidden">
-                        <div class="h-64 overflow-hidden relative">
-                            <img src="${imgUrl}" alt="${tour.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                            <div class="absolute top-0 right-0 bg-[#D4AF37] text-white px-4 py-2 font-bold text-sm">
-                                ${tour.price}
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="font-serif font-bold text-xl mb-2 text-gray-800">${tour.title}</h3>
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">${tour.description}</p>
-                            <button onclick="openWhatsApp('${tour.title}')" class="text-[#D4AF37] font-bold text-sm tracking-widest uppercase hover:underline">
-                                Booking Sekarang <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Render Cars
-            const carContainer = document.getElementById('car-grid');
-            carContainer.innerHTML = '';
-            data.cars.forEach(car => {
-                const imgUrl = car.image && car.image.includes('http') ? car.image : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=500&q=60';
-                
-                carContainer.innerHTML += `
-                    <div class="bg-gray-50 p-4 border border-gray-100 hover:shadow-md transition text-center">
-                        <img src="${imgUrl}" alt="${car.name}" class="w-full h-40 object-contain mb-4 mix-blend-multiply">
-                        <h3 class="font-bold text-lg mb-1">${car.name}</h3>
-                        <p class="text-[#D4AF37] font-bold mb-2">${car.price} <span class="text-xs text-gray-400 font-normal">/ 10 Jam</span></p>
-                        <p class="text-xs text-gray-500 mb-4"><i class="fas fa-user-friends"></i> ${car.capacity}</p>
-                        <button onclick="openWhatsApp('Sewa Mobil ${car.name}')" class="w-full border border-gray-300 py-2 text-xs font-bold uppercase hover:bg-gray-800 hover:text-white transition">Pesan</button>
-                    </div>
-                `;
-            });
+        // Fungsi untuk mengarahkan ke WhatsApp dengan pesan otomatis sesuai paket
+        function bookNow(packageName) {
+            // GANTI NOMOR INI DENGAN NOMOR WA ANDA (Format: 628...)
+            const phoneNumber = "6281234567890"; 
+            const message = `Halo, saya tertarik booking untuk paket: ${packageName}. Mohon info ketersediaannya.`;
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
         }
-
-        // 3. Admin Login Functions
-        function toggleAdminModal() {
-            const modal = document.getElementById('admin-modal');
-            modal.classList.toggle('hidden');
-        }
-
-        async function doLogin() {
-            if(!API_ENDPOINT) {
-                alert("Fitur Login hanya bekerja jika sudah terhubung ke Google Sheet. Saat ini Anda dalam Mode Demo.");
-                return;
-            }
-
-            const pass = document.getElementById('admin-pass').value;
-            const btn = document.querySelector('#login-form button');
-            
-            btn.innerHTML = "Memproses...";
-            
-            // POST request to Apps Script
-            try {
-                const res = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', password: pass })
-                });
-                const result = await res.json();
-
-                if(result.status === 'success') {
-                    document.getElementById('login-form').classList.add('hidden');
-                    document.getElementById('edit-form').classList.remove('hidden');
-                    populateEditForm();
-                } else {
-                    alert("Password Salah!");
-                }
-            } catch (e) {
-                alert("Error login: " + e);
-            } finally {
-                btn.innerHTML = "LOGIN";
-            }
-        }
-
-        function populateEditForm() {
-            // Fill inputs with current globalConfig
-            document.getElementById('edit-name').value = globalConfig.company_name || '';
-            document.getElementById('edit-wa').value = globalConfig.whatsapp || '';
-            document.getElementById('edit-ig').value = globalConfig.instagram || '';
-            document.getElementById('edit-fb').value = globalConfig.facebook || '';
-            document.getElementById('edit-tt').value = globalConfig.tiktok || '';
-            document.getElementById('edit-hero-title').value = globalConfig.hero_title || '';
-            document.getElementById('edit-hero-desc').value = globalConfig.hero_desc || '';
-        }
-
-        async function saveConfig() {
-            if(!API_ENDPOINT) {
-                alert("Tidak dapat menyimpan karena belum terhubung ke Google Sheet.");
-                return;
-            }
-
-            const newData = {
-                company_name: document.getElementById('edit-name').value,
-                whatsapp: document.getElementById('edit-wa').value,
-                instagram: document.getElementById('edit-ig').value,
-                facebook: document.getElementById('edit-fb').value,
-                tiktok: document.getElementById('edit-tt').value,
-                hero_title: document.getElementById('edit-hero-title').value,
-                hero_desc: document.getElementById('edit-hero-desc').value
-            };
-
-            const btn = document.querySelector('#edit-form button');
-            btn.innerHTML = "Menyimpan...";
-
-            try {
-                await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'updateConfig', data: newData })
-                });
-                alert("Data berhasil disimpan! Halaman akan dimuat ulang.");
-                location.reload();
-            } catch (e) {
-                alert("Gagal menyimpan: " + e);
-            } finally {
-                btn.innerHTML = "SIMPAN PERUBAHAN";
-            }
-        }
-
-        // Helper Functions
-        function setText(id, val) { 
-            const el = document.getElementById(id); 
-            if(el) el.innerText = val || ''; 
-        }
-        function setHref(id, val) { 
-            const el = document.getElementById(id);
-            if(el) el.href = val || '#'; 
-        }
-        function formatWA(num) { return num ? '+' + num : ''; }
-        function openWhatsApp(msg = '') {
-            const wa = globalConfig.whatsapp;
-            const text = `Halo, saya tertarik dengan ${msg ? msg : 'layanan tour anda'}.`;
-            if(wa) window.open(`https://wa.me/${wa}?text=${encodeURIComponent(text)}`, '_blank');
-            else alert("Nomor WA belum diatur admin.");
-        }
-
     </script>
 </body>
 </html>
