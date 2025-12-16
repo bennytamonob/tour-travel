@@ -4,92 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bali Pesona Tour & Travel</title>
-    <!-- Tailwind CSS untuk styling cepat dan modern -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome untuk Ikon -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 untuk Popup Cantik -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-        }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
         .hero-bg {
             background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
         }
-        .card-zoom:hover img {
-            transform: scale(1.1);
-        }
-        .card-zoom img {
-            transition: transform 0.5s ease;
-        }
+        .card-zoom:hover img { transform: scale(1.1); }
+        .card-zoom img { transition: transform 0.5s ease; }
+        
+        /* Admin Panel Styles */
+        #admin-panel { display: none; }
+        .admin-input { border: 1px solid #ddd; padding: 8px; border-radius: 4px; width: 100%; margin-bottom: 10px; }
+        .tab-btn.active { background-color: #f97316; color: white; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 relative">
 
-    <!-- Navigasi Sederhana -->
-    <nav class="bg-white shadow-md fixed w-full z-50 top-0">
+    <!-- LOGIN ADMIN BUTTON (Tersembunyi di pojok kiri bawah) -->
+    <div class="fixed bottom-4 left-4 z-50">
+        <button onclick="toggleLogin()" class="bg-gray-800 text-white p-2 rounded-full opacity-50 hover:opacity-100 transition text-xs">
+            <i class="fas fa-lock"></i> Admin
+        </button>
+    </div>
+
+    <!-- ADMIN PANEL OVERLAY -->
+    <div id="admin-panel" class="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-end">
+        <div class="bg-white w-full md:w-1/3 h-full overflow-y-auto shadow-2xl animate-slide-in">
+            <div class="p-4 bg-gray-800 text-white flex justify-between items-center sticky top-0 z-10">
+                <h2 class="font-bold text-lg"><i class="fas fa-cogs"></i> Admin Dashboard</h2>
+                <button onclick="closeAdmin()" class="text-red-400 hover:text-red-200"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex border-b text-sm">
+                <button onclick="switchTab('general')" class="tab-btn active flex-1 py-3 px-2 text-center font-semibold bg-gray-100">Umum</button>
+                <button onclick="switchTab('tours')" class="tab-btn flex-1 py-3 px-2 text-center font-semibold bg-gray-100">Tour</button>
+                <button onclick="switchTab('cars')" class="tab-btn flex-1 py-3 px-2 text-center font-semibold bg-gray-100">Mobil</button>
+            </div>
+
+            <!-- Tab Content: General -->
+            <div id="tab-general" class="p-6 space-y-4">
+                <h3 class="font-bold text-orange-600 border-b pb-2">Info Perusahaan</h3>
+                <div><label class="text-xs">Nama Perusahaan</label><input type="text" id="edit-company-name" class="admin-input"></div>
+                <div><label class="text-xs">Copyright Footer</label><input type="text" id="edit-copyright" class="admin-input"></div>
+
+                <h3 class="font-bold text-orange-600 border-b pb-2 mt-6">Kontak & Sosmed</h3>
+                <div><label class="text-xs">No WhatsApp (628...)</label><input type="text" id="edit-wa" class="admin-input"></div>
+                <div><label class="text-xs">Email</label><input type="text" id="edit-email" class="admin-input"></div>
+                <div><label class="text-xs">Link Instagram</label><input type="text" id="edit-ig" class="admin-input"></div>
+                <div><label class="text-xs">Link Facebook</label><input type="text" id="edit-fb" class="admin-input"></div>
+                <div><label class="text-xs">Link TikTok</label><input type="text" id="edit-tiktok" class="admin-input"></div>
+                
+                <button onclick="saveChanges()" class="w-full bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 mt-4">Simpan Perubahan</button>
+                
+                <div class="mt-8 text-xs text-gray-400 border-t pt-2">
+                    <p>Status Database: <span id="db-status" class="text-yellow-600">Mode Demo (LocalStorage)</span></p>
+                    <p class="italic mt-1">Untuk menghubungkan ke Google Sheet, edit variabel GAS_URL di script.</p>
+                </div>
+            </div>
+
+            <!-- Tab Content: Tours -->
+            <div id="tab-tours" class="p-6 hidden">
+                <button onclick="addNewTour()" class="w-full bg-blue-500 text-white py-2 rounded mb-4 text-sm"><i class="fas fa-plus"></i> Tambah Paket Tour</button>
+                <div id="admin-tour-list" class="space-y-4">
+                    <!-- List Paket akan di-render JS -->
+                </div>
+            </div>
+
+            <!-- Tab Content: Cars -->
+            <div id="tab-cars" class="p-6 hidden">
+                <button onclick="addNewCar()" class="w-full bg-blue-500 text-white py-2 rounded mb-4 text-sm"><i class="fas fa-plus"></i> Tambah Mobil</button>
+                <div id="admin-car-list" class="space-y-4">
+                    <!-- List Mobil akan di-render JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN WEBSITE CONTENT (READ ONLY) -->
+    
+    <!-- Navigasi -->
+    <nav class="bg-white shadow-md fixed w-full z-40 top-0">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-plane-departure text-orange-500 text-2xl"></i>
-                    <span class="font-bold text-xl text-gray-800">Bali Pesona</span>
+                    <span id="view-company-name" class="font-bold text-xl text-gray-800">Loading...</span>
                 </div>
                 <div class="hidden md:flex space-x-6">
                     <a href="#home" class="hover:text-orange-500 transition">Beranda</a>
                     <a href="#packages" class="hover:text-orange-500 transition">Paket Tour</a>
+                    <a href="#cars" class="hover:text-orange-500 transition">Sewa Mobil</a>
                     <a href="#contact" class="hover:text-orange-500 transition">Kontak</a>
                 </div>
-                <!-- Tombol Mobile Menu (Hanya Icon) -->
-                <div class="md:hidden text-gray-600">
-                    <i class="fas fa-bars text-xl"></i>
-                </div>
+                <div class="md:hidden text-gray-600"><i class="fas fa-bars text-xl"></i></div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <section id="home" class="hero-bg h-screen flex items-center justify-center text-center text-white px-4">
         <div>
             <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Jelajahi Keindahan Bali</h1>
-            <p class="text-lg md:text-xl mb-8 drop-shadow-md">Liburan tak terlupakan dengan pelayanan terbaik dan harga bersahabat.</p>
-            <a href="#packages" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg transform hover:-translate-y-1">
-                Lihat Paket Wisata
-            </a>
-        </div>
-    </section>
-
-    <!-- Keunggulan Kami -->
-    <section class="py-16 bg-white">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-12 text-gray-800">Kenapa Memilih Kami?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-6 border rounded-xl hover:shadow-xl transition">
-                    <div class="text-orange-500 text-4xl mb-4">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Terpercaya & Aman</h3>
-                    <p class="text-gray-600">Kami adalah agen travel lokal resmi dengan driver berpengalaman.</p>
-                </div>
-                <div class="p-6 border rounded-xl hover:shadow-xl transition">
-                    <div class="text-orange-500 text-4xl mb-4">
-                        <i class="fas fa-tag"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Harga Terbaik</h3>
-                    <p class="text-gray-600">Penawaran harga transparan tanpa biaya tersembunyi.</p>
-                </div>
-                <div class="p-6 border rounded-xl hover:shadow-xl transition">
-                    <div class="text-orange-500 text-4xl mb-4">
-                        <i class="fas fa-camera-retro"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Dokumentasi Gratis</h3>
-                    <p class="text-gray-600">Driver kami siap membantu mengambil foto terbaik liburan Anda.</p>
-                </div>
-            </div>
+            <p class="text-lg md:text-xl mb-8 drop-shadow-md">Liburan tak terlupakan dengan pelayanan terbaik.</p>
+            <a href="#packages" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg">Lihat Paket</a>
         </div>
     </section>
 
@@ -97,123 +126,321 @@
     <section id="packages" class="py-16 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800">Paket Populer</h2>
-                <p class="text-gray-600 mt-2">Pilihan destinasi favorit wisatawan di Bali</p>
+                <h2 class="text-3xl font-bold text-gray-800">Paket Wisata</h2>
+                <p class="text-gray-600 mt-2">Pilihan destinasi favorit</p>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Paket 1: Nusa Penida -->
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
-                    <div class="overflow-hidden h-48">
-                        <img src="https://images.unsplash.com/photo-1598324789736-4861f89564a0?auto=format&fit=crop&w=800&q=80" alt="Nusa Penida" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded uppercase">Best Seller</span>
-                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 1 Hari</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Nusa Penida Trip</h3>
-                        <p class="text-gray-600 text-sm mb-4">Kelingking Beach, Broken Beach, Angel's Billabong, Crystal Bay.</p>
-                        <div class="flex justify-between items-center border-t pt-4">
-                            <div>
-                                <p class="text-xs text-gray-500">Mulai dari</p>
-                                <p class="text-lg font-bold text-orange-600">IDR 350K</p>
-                            </div>
-                            <button onclick="bookNow('Nusa Penida Trip')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                                <i class="fab fa-whatsapp"></i> Booking
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paket 2: Ubud & Kintamani -->
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
-                    <div class="overflow-hidden h-48">
-                        <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80" alt="Ubud Rice Terrace" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded uppercase">Budaya</span>
-                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 10 Jam</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Ubud & Kintamani</h3>
-                        <p class="text-gray-600 text-sm mb-4">Tegalalang Rice Terrace, Monkey Forest, Volcano View, Coffee Plantation.</p>
-                        <div class="flex justify-between items-center border-t pt-4">
-                            <div>
-                                <p class="text-xs text-gray-500">Mulai dari</p>
-                                <p class="text-lg font-bold text-orange-600">IDR 500K</p>
-                            </div>
-                            <button onclick="bookNow('Ubud & Kintamani')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                                <i class="fab fa-whatsapp"></i> Booking
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paket 3: South Bali / Uluwatu -->
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
-                    <div class="overflow-hidden h-48">
-                        <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=80" alt="Uluwatu Temple" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="bg-purple-100 text-purple-600 text-xs font-bold px-2 py-1 rounded uppercase">Sunset</span>
-                            <span class="text-gray-500 text-sm"><i class="fas fa-clock"></i> 8 Jam</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Uluwatu Sunset</h3>
-                        <p class="text-gray-600 text-sm mb-4">GWK Cultural Park, Melasti Beach, Uluwatu Temple, Kecak Dance.</p>
-                        <div class="flex justify-between items-center border-t pt-4">
-                            <div>
-                                <p class="text-xs text-gray-500">Mulai dari</p>
-                                <p class="text-lg font-bold text-orange-600">IDR 450K</p>
-                            </div>
-                            <button onclick="bookNow('Uluwatu Sunset')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
-                                <i class="fab fa-whatsapp"></i> Booking
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div id="public-tour-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Diisi oleh JS -->
             </div>
         </div>
     </section>
 
-    <!-- Call to Action / Kontak -->
+    <!-- Sewa Mobil -->
+    <section id="cars" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800">Sewa Mobil</h2>
+                <p class="text-gray-600 mt-2">Armada bersih dan nyaman</p>
+            </div>
+            <div id="public-car-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Diisi oleh JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Kontak -->
     <section id="contact" class="py-16 bg-orange-600 text-white">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-4">Siap Liburan ke Bali?</h2>
-            <p class="text-lg mb-8 text-orange-100">Konsultasikan rencana perjalanan Anda bersama kami secara gratis. Kami siap menjemput Anda di Bandara Ngurah Rai.</p>
+            <h2 class="text-3xl font-bold mb-4">Butuh Bantuan?</h2>
+            <p class="text-lg mb-8 text-orange-100">Hubungi kami untuk penawaran terbaik.</p>
             
-            <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="https://wa.me/6281234567890?text=Halo%2C%20saya%20tertarik%20dengan%20paket%20wisata%20Bali" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center justify-center gap-2">
-                    <i class="fab fa-whatsapp text-2xl"></i> Chat via WhatsApp
-                </a>
-                <a href="mailto:info@balipesona.com" class="bg-white hover:bg-gray-100 text-orange-600 font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center justify-center gap-2">
-                    <i class="fas fa-envelope text-xl"></i> Kirim Email
-                </a>
+            <div class="flex flex-wrap justify-center gap-4" id="social-links-container">
+                <!-- Link Sosmed di-render JS -->
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300 py-8">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="mb-4">&copy; 2024 Bali Pesona Tour & Travel. All rights reserved.</p>
-            <div class="flex justify-center space-x-4">
-                <a href="#" class="hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
-                <a href="#" class="hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
-                <a href="#" class="hover:text-white"><i class="fab fa-tiktok text-xl"></i></a>
-            </div>
-        </div>
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center">
+        <p id="view-copyright">&copy; 2024 Bali Pesona.</p>
     </footer>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Fungsi untuk mengarahkan ke WhatsApp dengan pesan otomatis sesuai paket
-        function bookNow(packageName) {
-            // GANTI NOMOR INI DENGAN NOMOR WA ANDA (Format: 628...)
-            const phoneNumber = "6281234567890"; 
-            const message = `Halo, saya tertarik booking untuk paket: ${packageName}. Mohon info ketersediaannya.`;
-            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+        // --- KONFIGURASI DATABASE ---
+        // Jika Anda sudah punya Google Apps Script Web App URL, masukkan di sini:
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzj4pphaYB8fRzpwW-WTnAt-jL6Da7OpVTzsuySpxJtq2S2T5L4XpNlAT-bFH30g9MUhA/exec"; 
+        // Contoh: "https://script.google.com/macros/s/AKfycbx.../exec"
+        
+        // --- DATA DEFAULT (Jika database kosong) ---
+        const defaultData = {
+            companyName: "Bali Pesona Tour",
+            copyright: "© 2024 Bali Pesona Tour & Travel. All rights reserved.",
+            contact: {
+                wa: "6281234567890",
+                email: "info@balipesona.com",
+                ig: "https://instagram.com",
+                fb: "https://facebook.com",
+                tiktok: "https://tiktok.com"
+            },
+            tours: [
+                { id: 1, title: "Nusa Penida Trip", price: "350K", duration: "1 Hari", img: "https://images.unsplash.com/photo-1598324789736-4861f89564a0?w=800", desc: "Kelingking Beach, Broken Beach, Angel's Billabong" },
+                { id: 2, title: "Ubud & Kintamani", price: "500K", duration: "10 Jam", img: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800", desc: "Tegalalang Rice Terrace, Monkey Forest, Volcano View" },
+                { id: 3, title: "Uluwatu Sunset", price: "450K", duration: "8 Jam", img: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800", desc: "GWK, Melasti Beach, Uluwatu Temple, Kecak Dance" }
+            ],
+            cars: [
+                { id: 1, title: "Toyota Avanza", price: "500K", cap: "6 Orang", img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800", features: ["Full AC", "BBM + Supir"] },
+                { id: 2, title: "Innova Reborn", price: "850K", cap: "7 Orang", img: "https://images.unsplash.com/photo-1623869675785-3e2843e74366?w=800", features: ["Extra Nyaman", "BBM + Supir"] }
+            ]
+        };
+
+        // State Aplikasi
+        let appData = JSON.parse(localStorage.getItem('baliTourData')) || defaultData;
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWebsite();
+            
+            // Coba fetch dari Google Sheet jika URL ada
+            if(GAS_URL) {
+                document.getElementById('db-status').innerText = "Menghubungkan ke Google Sheet...";
+                fetch(GAS_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Pastikan data valid sebelum assign
+                        if(data && data.companyName) {
+                            appData = data;
+                            // Pastikan array features ada jika kosong di DB
+                            if (appData.cars) {
+                                appData.cars.forEach(car => {
+                                    if (!Array.isArray(car.features)) car.features = [];
+                                });
+                            }
+                            renderWebsite();
+                            document.getElementById('db-status').innerText = "Terhubung: Google Sheet";
+                            document.getElementById('db-status').className = "text-green-500 font-bold";
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Gagal load DB", err);
+                        document.getElementById('db-status').innerText = "Gagal Konek (Pakai Data Lokal)";
+                    });
+            }
+        });
+
+        // --- FUNGSI RENDER (TAMPILAN) ---
+        function renderWebsite() {
+            // Safety check untuk memastikan appData valid
+            if (!appData) return;
+
+            // 1. General Info
+            document.getElementById('view-company-name').innerText = appData.companyName || 'Nama Travel';
+            document.getElementById('view-copyright').innerText = appData.copyright || '';
+            document.title = appData.companyName || 'Bali Travel';
+
+            // 2. Render Tours (Public)
+            const tourContainer = document.getElementById('public-tour-list');
+            // Safety check: pastikan tours adalah array
+            const tours = Array.isArray(appData.tours) ? appData.tours : [];
+            
+            tourContainer.innerHTML = tours.map(t => `
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom">
+                    <div class="h-48 overflow-hidden"><img src="${t.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400'"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between mb-2">
+                            <h3 class="font-bold text-xl">${t.title || 'Tanpa Judul'}</h3>
+                            <span class="text-gray-500 text-xs"><i class="fas fa-clock"></i> ${t.duration || '-'}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4 h-10 overflow-hidden">${t.desc || ''}</p>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <span class="font-bold text-orange-600">IDR ${t.price || '0'}</span>
+                            <button onclick="bookNow('Tour: ${t.title}')" class="bg-green-500 text-white px-4 py-2 rounded text-sm hover:bg-green-600"><i class="fab fa-whatsapp"></i> Booking</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 3. Render Cars (Public)
+            const carContainer = document.getElementById('public-car-list');
+            // Safety check: pastikan cars adalah array
+            const cars = Array.isArray(appData.cars) ? appData.cars : [];
+            
+            carContainer.innerHTML = cars.map(c => {
+                // Safety check: pastikan features adalah array sebelum di-join
+                const features = Array.isArray(c.features) ? c.features : [];
+                
+                return `
+                <div class="bg-gray-50 rounded-xl overflow-hidden shadow border">
+                    <div class="h-48 overflow-hidden"><img src="${c.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400'"></div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">${c.title || 'Tanpa Nama'}</h3>
+                        <div class="text-sm text-gray-600 mb-4">
+                            <p><i class="fas fa-user-friends text-orange-500"></i> ${c.cap || '-'}</p>
+                            <p>${features.join(' • ')}</p>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <span class="font-bold text-orange-600">IDR ${c.price || '0'}</span>
+                            <button onclick="bookNow('Sewa Mobil: ${c.title}')" class="bg-orange-500 text-white px-4 py-2 rounded text-sm hover:bg-orange-600"><i class="fab fa-whatsapp"></i> Pesan</button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+
+            // 4. Render Social Links
+            // Safety check contact object
+            const contact = appData.contact || {};
+            const socialHTML = `
+                <a href="https://wa.me/${contact.wa || ''}" target="_blank" class="bg-green-500 text-white py-3 px-6 rounded-full flex items-center gap-2 hover:scale-105 transition"><i class="fab fa-whatsapp text-2xl"></i> WhatsApp</a>
+                <a href="${contact.ig || '#'}" target="_blank" class="bg-pink-600 text-white py-3 px-6 rounded-full flex items-center gap-2 hover:scale-105 transition"><i class="fab fa-instagram text-2xl"></i> Instagram</a>
+                <a href="${contact.fb || '#'}" target="_blank" class="bg-blue-600 text-white py-3 px-6 rounded-full flex items-center gap-2 hover:scale-105 transition"><i class="fab fa-facebook text-2xl"></i> Facebook</a>
+                <a href="${contact.tiktok || '#'}" target="_blank" class="bg-black text-white py-3 px-6 rounded-full flex items-center gap-2 hover:scale-105 transition"><i class="fab fa-tiktok text-2xl"></i> TikTok</a>
+                <a href="mailto:${contact.email || ''}" class="bg-gray-500 text-white py-3 px-6 rounded-full flex items-center gap-2 hover:scale-105 transition"><i class="fas fa-envelope text-xl"></i> Email</a>
+            `;
+            document.getElementById('social-links-container').innerHTML = socialHTML;
+
+            // 5. Update Admin Inputs Values
+            document.getElementById('edit-company-name').value = appData.companyName || '';
+            document.getElementById('edit-copyright').value = appData.copyright || '';
+            document.getElementById('edit-wa').value = contact.wa || '';
+            document.getElementById('edit-email').value = contact.email || '';
+            document.getElementById('edit-ig').value = contact.ig || '';
+            document.getElementById('edit-fb').value = contact.fb || '';
+            document.getElementById('edit-tiktok').value = contact.tiktok || '';
+            
+            renderAdminLists();
+        }
+
+        // --- ADMIN LOGIC ---
+        function toggleLogin() {
+            Swal.fire({
+                title: 'Login Admin',
+                input: 'password',
+                inputPlaceholder: 'Masukkan password admin',
+                showCancelButton: true,
+                confirmButtonText: 'Login',
+                confirmButtonColor: '#ea580c'
+            }).then((result) => {
+                // PASSWORD SEMENTARA: "admin123"
+                if (result.isConfirmed && result.value === 'admin123') { 
+                    document.getElementById('admin-panel').style.display = 'flex';
+                    Swal.fire('Berhasil!', 'Selamat datang di panel admin.', 'success');
+                } else if (result.isConfirmed) {
+                    Swal.fire('Gagal', 'Password salah.', 'error');
+                }
+            });
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-orange-500', 'text-white'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('bg-gray-100'));
+            event.target.classList.add('active'); // CSS Handles color
+            
+            document.getElementById('tab-general').style.display = 'none';
+            document.getElementById('tab-tours').style.display = 'none';
+            document.getElementById('tab-cars').style.display = 'none';
+            
+            document.getElementById('tab-' + tabName).style.display = 'block';
+        }
+
+        function renderAdminLists() {
+            const tours = Array.isArray(appData.tours) ? appData.tours : [];
+            const cars = Array.isArray(appData.cars) ? appData.cars : [];
+
+            // Render Admin Tour List
+            document.getElementById('admin-tour-list').innerHTML = tours.map((t, idx) => `
+                <div class="border p-3 rounded bg-gray-50 text-sm">
+                    <div class="font-bold mb-2">ID: ${t.id} - ${t.title}</div>
+                    <input type="text" placeholder="Judul" class="admin-input" value="${t.title}" onchange="updateTour(${idx}, 'title', this.value)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" placeholder="Harga" class="admin-input" value="${t.price}" onchange="updateTour(${idx}, 'price', this.value)">
+                        <input type="text" placeholder="Durasi" class="admin-input" value="${t.duration}" onchange="updateTour(${idx}, 'duration', this.value)">
+                    </div>
+                    <input type="text" placeholder="URL Gambar" class="admin-input" value="${t.img}" onchange="updateTour(${idx}, 'img', this.value)">
+                    <textarea placeholder="Deskripsi" class="admin-input" onchange="updateTour(${idx}, 'desc', this.value)">${t.desc}</textarea>
+                    <button onclick="deleteTour(${idx})" class="text-red-500 text-xs hover:underline">Hapus Paket Ini</button>
+                </div>
+            `).join('');
+
+            // Render Admin Car List
+            document.getElementById('admin-car-list').innerHTML = cars.map((c, idx) => `
+                <div class="border p-3 rounded bg-gray-50 text-sm">
+                    <div class="font-bold mb-2">ID: ${c.id} - ${c.title}</div>
+                    <input type="text" placeholder="Nama Mobil" class="admin-input" value="${c.title}" onchange="updateCar(${idx}, 'title', this.value)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" placeholder="Harga" class="admin-input" value="${c.price}" onchange="updateCar(${idx}, 'price', this.value)">
+                        <input type="text" placeholder="Kapasitas" class="admin-input" value="${c.cap}" onchange="updateCar(${idx}, 'cap', this.value)">
+                    </div>
+                    <input type="text" placeholder="URL Gambar" class="admin-input" value="${c.img}" onchange="updateCar(${idx}, 'img', this.value)">
+                    <button onclick="deleteCar(${idx})" class="text-red-500 text-xs hover:underline">Hapus Mobil Ini</button>
+                </div>
+            `).join('');
+        }
+
+        // --- UPDATE DATA LOGIC ---
+        function updateTour(index, field, value) { appData.tours[index][field] = value; }
+        function deleteTour(index) { 
+            if(confirm("Hapus paket ini?")) { appData.tours.splice(index, 1); renderAdminLists(); } 
+        }
+        function addNewTour() {
+            if (!Array.isArray(appData.tours)) appData.tours = [];
+            appData.tours.push({ id: Date.now(), title: "Paket Baru", price: "0K", duration: "1 Hari", img: "https://via.placeholder.com/400", desc: "Deskripsi paket..." });
+            renderAdminLists();
+        }
+
+        function updateCar(index, field, value) { appData.cars[index][field] = value; }
+        function deleteCar(index) { 
+            if(confirm("Hapus mobil ini?")) { appData.cars.splice(index, 1); renderAdminLists(); } 
+        }
+        function addNewCar() {
+            if (!Array.isArray(appData.cars)) appData.cars = [];
+            appData.cars.push({ id: Date.now(), title: "Mobil Baru", price: "0K", cap: "4 Orang", img: "https://via.placeholder.com/400", features: ["AC", "Supir"] });
+            renderAdminLists();
+        }
+
+        // --- SAVE FUNCTION ---
+        function saveChanges() {
+            // Ambil data dari tab General
+            appData.companyName = document.getElementById('edit-company-name').value;
+            appData.copyright = document.getElementById('edit-copyright').value;
+            if(!appData.contact) appData.contact = {};
+            appData.contact.wa = document.getElementById('edit-wa').value;
+            appData.contact.email = document.getElementById('edit-email').value;
+            appData.contact.ig = document.getElementById('edit-ig').value;
+            appData.contact.fb = document.getElementById('edit-fb').value;
+            appData.contact.tiktok = document.getElementById('edit-tiktok').value;
+
+            // 1. Simpan ke LocalStorage (Browser saat ini)
+            localStorage.setItem('baliTourData', JSON.stringify(appData));
+            
+            // 2. Refresh Tampilan
+            renderWebsite();
+
+            // 3. Kirim ke Google Sheet (Jika ada URL)
+            if(GAS_URL) {
+                Swal.fire({title: 'Menyimpan ke Database...', didOpen: () => Swal.showLoading()});
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Penting untuk GAS
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(appData)
+                }).then(() => {
+                    Swal.fire('Tersimpan!', 'Data berhasil update ke Google Sheet & Lokal.', 'success');
+                }).catch(err => {
+                    Swal.fire('Error', 'Gagal konek ke Google Sheet', 'error');
+                });
+            } else {
+                Swal.fire('Tersimpan (Lokal)!', 'Data tersimpan di browser ini. Untuk simpan permanen online, hubungkan script.', 'success');
+            }
+        }
+
+        function bookNow(itemName) {
+            const waNum = appData.contact && appData.contact.wa ? appData.contact.wa : '6281234567890';
+            const message = `Halo Admin ${appData.companyName}, saya tertarik ${itemName}. Mohon info detailnya.`;
+            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(message)}`, '_blank');
         }
     </script>
 </body>
